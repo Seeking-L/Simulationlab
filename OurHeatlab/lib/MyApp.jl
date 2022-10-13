@@ -26,7 +26,7 @@ using Stipple,StipplePlotly, StippleUI, DataFrames
 end
 end
 
-
+#PlotData:StipplePlotly/Charts
 contourPlot(z, n=10, L=0.2) = PlotData(
     x=collect(range(0, L, length=n)),
     y=collect(range(0, L, length=n)),
