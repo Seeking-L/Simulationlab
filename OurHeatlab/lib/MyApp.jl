@@ -4,7 +4,7 @@ using DataFrames
 include("solver.jl") # get_data from solver.jl
 
 module MyApp
-using Stipple,StipplePlotly, StippleUI, DataFrames
+using Stipple, StipplePlotly, StippleUI, DataFrames
 @reactive mutable struct MyPage <: ReactiveModel
     tableData::R{DataTable} = DataTable(DataFrame(1000 * ones(10, 10), ["$i" for i in 1:10]))
     credit_data_pagination::DataTablePagination = DataTablePagination(rows_per_page=10)
@@ -161,7 +161,5 @@ function ui(model::MyApp.MyPage)
                     ]
                 )
             ])
-            ]
-            
-    )
+        ])
 end
