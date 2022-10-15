@@ -6,27 +6,38 @@ include("solver.jl") # get_data from solver.jl
 module MyApp
 using Stipple,StipplePlotly, StippleUI, DataFrames
 @reactive mutable struct MyPage <: ReactiveModel
-    tableData::R{DataTable} = DataTable(DataFrame(1000 * ones(10, 10), ["$i" for i in 1:10]))
+    #1.初始化表格
+    tableData::R{DataTable} = DataTable(DataFrame(zeros(10,10), ["$i" for i in 1:10]))
+    #1.1.设置表格的显示方式(一页10行)
     credit_data_pagination::DataTablePagination = DataTablePagination(rows_per_page=10)
 
+    #2.交互所必要变量
     value::R{Int} = 0
     click::R{Int} = 0
 
+    #3.温度边界条件
+    #3.1可选的函数表单
     func_features::R{Vector{Symbol}} = [:_sin, :_tanh, :_sign]
+    #3.2默认边界
     func::R{Symbol} = :_sign
-
+    #3.3初始温度
     T0::R{Float64} = 1500.0
+    #3.4环境温度
     Tout::R{Float64} = 0.0
+    #3.5求解的时间域(0~timefield)
     timefield::R{Float64} = 100
+    #3.6影响温度边界条件的常数
     para::R{Float64} = 1.0
 
+    #4.绘图
+    #4.1初始化图片
     plot_data::R{Vector{PlotData}} = []
+    #4.2绘制方式
     layout::R{PlotLayout} = PlotLayout(plot_bgcolor="#fff")
-
 end
 end
 
-
+#设置绘图函数
 contourPlot(z, n=10, L=0.2) = PlotData(
     x=collect(range(0, L, length=n)),
     y=collect(range(0, L, length=n)),
@@ -36,14 +47,12 @@ contourPlot(z, n=10, L=0.2) = PlotData(
     name="test",
 )
 
-
+#设置计算函数与绘图的接口
 function compute_data(ic_model::MyApp.MyPage)
     T0 = ic_model.T0[]
     Tout = ic_model.Tout[]
     timefield = ic_model.timefield[]
-    para = ic_model.para[]
-    func = ic_model.func[]
-    res = get_data(T0, Tout, timefield, para, func)
+    res = get_data(T0, Tout, timefield)
     len = length(res[1, 1, :])
     for i in 1:len
         ic_model.plot_data[] = [contourPlot(res[:, :, i])]
@@ -54,14 +63,14 @@ function compute_data(ic_model::MyApp.MyPage)
     nothing
 end
 
-
+#创建网页
 function ui(model::MyApp.MyPage)
-
+    #交互循环
     onany(model.value) do (_...)
         model.click[] += 1
         compute_data(model)
     end
-
+    #网页内容
     page(model, class="container", title="Ai4Lab",
         head_content=Genie.Assets.favicon_support(),
         prepend=style(
@@ -161,7 +170,7 @@ function ui(model::MyApp.MyPage)
                     ]
                 )
             ])
-            ]
+        ]
             
     )
 end
