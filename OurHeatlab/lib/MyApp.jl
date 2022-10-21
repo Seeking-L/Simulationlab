@@ -4,10 +4,10 @@ using DataFrames
 include("solver.jl") # get_data from solver.jl
 
 module MyApp
-using Stipple,StipplePlotly, StippleUI, DataFrames
+using Stipple, StipplePlotly, StippleUI, DataFrames
 @reactive mutable struct MyPage <: ReactiveModel
     #1.初始化表格
-    tableData::R{DataTable} = DataTable(DataFrame(zeros(10,10), ["$i" for i in 1:10]))
+    tableData::R{DataTable} = DataTable(DataFrame(zeros(10, 10), ["$i" for i in 1:10]))
     #1.1.设置表格的显示方式(一页10行)
     credit_data_pagination::DataTablePagination = DataTablePagination(rows_per_page=10)
 
@@ -53,6 +53,11 @@ function compute_data(ic_model::MyApp.MyPage)
     Tout = ic_model.Tout[]
     timefield = ic_model.timefield[]
     res = get_data(T0, Tout, timefield)
+    #这里对原来的文件有所修改（我看不懂，具体问边hy————柳景荠）
+    #原来的文件的内容是长下面三行那样，并且solver.jl也有修改，改变了输入参数的量还有一些东西
+    # para = ic_model.para[]
+    # func = ic_model.func[]
+    # res = get_data(T0, Tout, timefield, para, func)
     len = length(res[1, 1, :])
     for i in 1:len
         ic_model.plot_data[] = [contourPlot(res[:, :, i])]
@@ -170,7 +175,5 @@ function ui(model::MyApp.MyPage)
                     ]
                 )
             ])
-        ]
-            
-    )
+        ])
 end
