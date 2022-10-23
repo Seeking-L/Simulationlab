@@ -17,9 +17,8 @@ using Stipple,StipplePlotly, StippleUI, DataFrames
 
     #3.温度边界条件
     #3.1可选的函数表单
-    func_features::R{Vector{Symbol}} = [:_sin, :_tanh, :_sign]
+    #func::R{Symbol} = :sin
     #3.2默认边界
-    func::R{Symbol} = :_sign
     #3.3初始温度
     T0::R{Float64} = 1500.0
     #3.4环境温度
@@ -139,7 +138,7 @@ function ui(model::MyApp.MyPage)
                     class="st-module",
                     [
                         h6("Change of Environmental Temperature")
-                        Stipple.select(:func; options=:func_features)
+                        #input("", placeholder = "输入温度表达式:", @bind(:func))
                     ]
                 )])
             row([
