@@ -107,36 +107,41 @@ function ui(model::MyApp.MyPage)
                     class="st-module",
                     [
                         h6("Initial Temperature: T0(℃)")
-                        slider(1000:50:2000,
-                            @data(:T0);
-                            label=true)
+                        #学长原本代码如下方注释
+                        # slider(1000:50:2000,
+                        #     @data(:T0);
+                        #     label=true)
+                        input("", placeholder="Input T0", @bind(:T0))#滑块改成输入框
                     ]
                 )
                 cell(
                     class="st-module",
                     [
                         h6("Environmental Temperature: Tout(℃)")
-                        slider(0:50:500,
-                            @data(:Tout);
-                            label=true)
+                        # slider(0:50:500,
+                        #     @data(:Tout);
+                        #     label=true)
+                        input("", placeholder="Input Tout", @bind(:Tout))
                     ]
                 )
                 cell(
                     class="st-module",
                     [
                         h6("Coefficient of t: Para")
-                        slider(0:0.1:2,
-                            @data(:para);
-                            label=true)
+                        # slider(0:0.1:2,
+                        #     @data(:para);
+                        #     label=true)
+                        input("", placeholder="Input para", @bind(:para))
                     ]
                 )
                 cell(
                     class="st-module",
                     [
                         h6("Time Domain(s)")
-                        slider(40:20:400,
-                            @data(:timefield);
-                            label=true)
+                        # slider(40:20:400,
+                        #     @data(:timefield);
+                        #     label=true)
+                        input("", placeholder="Input timefield", @bind(:timefield))
                     ]
                 )
                 cell(
