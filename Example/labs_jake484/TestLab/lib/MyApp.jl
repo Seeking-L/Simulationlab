@@ -1,7 +1,7 @@
 using Stipple, StipplePlotly, StippleUI
 
 module MyApp
-using Stipple,StipplePlotly, StippleUI, DataFrames
+using Stipple, StipplePlotly, StippleUI, DataFrames
 @reactive mutable struct MyPage <: ReactiveModel
     value::R{Int} = 0
     click::R{Int} = 0
@@ -16,9 +16,15 @@ using Stipple,StipplePlotly, StippleUI, DataFrames
     x_limit::R{Int} = 3
     paramenter::R{Float32} = 1.2
 
+    fcn_as_string::R{String} = "x+1"
+
 end
 end
 
+function fcnFromString(s)
+    f = eval(Meta.parse("x -> " * s))
+    return x -> Base.invokelatest(f, x)
+end
 
 pd(f, para, xlim, name) = PlotData(
     x=Float64[i for i in 1:0.1:xlim],
@@ -31,10 +37,16 @@ pd(f, para, xlim, name) = PlotData(
 function compute_data(ic_model::MyApp.MyPage)
     f_left = isequal(ic_model.f_left[], nothing) ? sin : eval(ic_model.f_left[])
     f_right = isequal(ic_model.f_right[], nothing) ? sin : eval(ic_model.f_right[])
+
+
+    fcn_as_string=ic_model.fcn_as_string[]
+    fx=fcnFromString(fcn_as_string)
+
+
     xlim = ic_model.x_limit[]
     para = ic_model.paramenter[]
     for i in 0:30
-        ic_model.plot_data[] = [pd(f_left, para, xlim + i, "测试函数1"), pd(f_right, para, xlim + i, "测试函数2")]
+        ic_model.plot_data[] = [pd(f_left, para, xlim + i, "测试函数1"), pd(f_right, para, xlim + i, "测试函数2"), pd(fx, para, xlim + i, "测试函数3")]
         sleep(1 / 30)
     end
     nothing
@@ -106,7 +118,15 @@ function ui(model::MyApp.MyPage)
                         h6("测试函数2")
                         Stipple.select(:f_right; options=:features)
                     ]
-                )])
+                )
+                cell(
+                    class="st-module",
+                    [
+                        h6("测试函数3")
+                        input("", placeholder="input fx", @bind(:fcn_as_string))
+                    ]
+                )
+            ])
             row([
                 cell(
                     class="st-module",
