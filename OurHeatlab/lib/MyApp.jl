@@ -1,7 +1,7 @@
 using Stipple, StipplePlotly, StippleUI, Genie
 using DataFrames
 
-include("solver.jl") # get_data from solver.jl
+include("solver.jl")
 
 boundaryConditions = [boundaryCondition(1, "0", "0", "500") for i = 1:4]
 
