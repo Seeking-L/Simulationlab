@@ -19,7 +19,7 @@ try
         end
         @async force_compile()
 
-        up(8000, "0.0.0.0", async=false)
+        up(8000, "0.0.0.0", async=false,open_browser=true)
     end
 catch e
     using Revise
@@ -30,7 +30,7 @@ catch e
         MyApp.MyPage |> init |> ui |> html
     end
 
-    up()
+    up(open_browser=true)
 end
 
 
