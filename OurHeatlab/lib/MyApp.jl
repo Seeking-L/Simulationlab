@@ -1,10 +1,11 @@
 using Stipple, StipplePlotly, StippleUI, Genie
 using DataFrames
 
-include("solver.jl") # get_data from solver.jl
+include("solver.jl")
 
 module MyApp
-using Stipple, StipplePlotly, StippleUI, DataFrames
+using Stipple,StipplePlotly, StippleUI, DataFrames
+include("solver.jl")
 @reactive mutable struct MyPage <: ReactiveModel
     #1.初始化表格
     tableData::R{DataTable} = DataTable(DataFrame(zeros(10, 10), ["$i" for i in 1:10]))
@@ -16,18 +17,28 @@ using Stipple, StipplePlotly, StippleUI, DataFrames
     click::R{Int} = 0
 
     #3.温度边界条件
-    #3.1可选的函数表单
-    #func::R{Symbol} = :sin
     #3.2默认边界
-    #3.3初始温度
-    T0::R{Float64} = 1500.0
-    #3.4环境温度
-    Tout::R{Float64} = 0.0
+    innerheat::R{String} = "0"
     #3.5求解的时间域(0~timefield)
     timefield::R{Float64} = 100
-    #3.6影响温度边界条件的常数
-    para::R{Float64} = 1.0
 
+    selections::R{Vector{String}} = ["第一类边界条件(温度)", "第二类边界条件(热流密度)", "第三类边界条件(对流换热)"]
+    selection1::R{String} = "第一类边界条件(温度)"
+    selection2::R{String} = "第一类边界条件(温度)"
+    selection3::R{String} = "第一类边界条件(温度)"
+    selection4::R{String} = "第一类边界条件(温度)"
+    showinput1::R{Bool} = false
+    showinput2::R{Bool} = false
+    showinput3::R{Bool} = false
+    showinput4::R{Bool} = false
+    funcstr1::R{String} = "0"
+    funcstr2::R{String} = "0"
+    funcstr3::R{String} = "0"
+    funcstr4::R{String} = "0"
+    h1::R{Float64} = 0.0
+    h2::R{Float64} = 0.0
+    h3::R{Float64} = 0.0
+    h4::R{Float64} = 0.0
     #4.绘图
     #4.1初始化图片
     plot_data::R{Vector{PlotData}} = []
@@ -46,17 +57,66 @@ contourPlot(z, n=10, L=0.2) = PlotData(
     name="test",
 )
 
+function change(mo::MyApp.MyPage)
+    if mo.selection1[] == "第一类边界条件(温度)"
+        boundaryConditions[1].serialNumber = 1
+        boundaryConditions[1].bt = mo.funcstr1[]
+        mo.showinput1[] = false
+    elseif mo.selection1[] == "第二类边界条件(热流密度)"
+        boundaryConditions[1].serialNumber = 2
+        boundaryConditions[1].qw = mo.funcstr1[]
+        mo.showinput1[] = false
+    else
+        boundaryConditions[1].serialNumber = 3
+        boundaryConditions[1].Tf = mo.funcstr1[]
+        mo.showinput1[] = true
+    end
+    if mo.selection2[] == "第一类边界条件(温度)"
+        boundaryConditions[3].serialNumber = 1
+        boundaryConditions[3].bt = mo.funcstr2[]
+        mo.showinput2[] = false
+    elseif mo.selection2[] == "第二类边界条件(热流密度)"
+        boundaryConditions[3].serialNumber = 2
+        boundaryConditions[3].qw = mo.funcstr2[]
+        mo.showinput2[] = false
+    else
+        boundaryConditions[3].serialNumber = 3
+        boundaryConditions[3].Tf = mo.funcstr2[]
+        mo.showinput2[] = true
+    end
+    if mo.selection3[] == "第一类边界条件(温度)"
+        boundaryConditions[2].serialNumber = 1
+        boundaryConditions[2].bt = mo.funcstr3[]
+        mo.showinput3[] = false
+    elseif mo.selection3[] == "第二类边界条件(热流密度)"
+        boundaryConditions[2].serialNumber = 2
+        boundaryConditions[2].qw = mo.funcstr3[]
+        mo.showinput3[] = false
+    else
+        boundaryConditions[2].serialNumber = 3
+        boundaryConditions[2].Tf = mo.funcstr3[]
+        mo.showinput3[] = true
+    end
+    if mo.selection4[] == "第一类边界条件(温度)"
+        boundaryConditions[4].serialNumber = 1
+        boundaryConditions[4].bt = mo.funcstr4[]
+        mo.showinput4[] = false
+    elseif mo.selection4[] == "第二类边界条件(热流密度)"
+        boundaryConditions[4].serialNumber = 2
+        boundaryConditions[4].qw = mo.funcstr4[]
+        mo.showinput4[] = false
+    else
+        boundaryConditions[4].serialNumber = 3
+        boundaryConditions[4].Tf = mo.funcstr4[]
+        mo.showinput4[] = true
+    end
+end
+
 #设置计算函数与绘图的接口
 function compute_data(ic_model::MyApp.MyPage)
-    T0 = ic_model.T0[]
-    Tout = ic_model.Tout[]
     timefield = ic_model.timefield[]
-    res = get_data(T0, Tout, timefield)
-    #这里对原来的文件有所修改（我看不懂，具体问边hy————柳景荠）
-    #原来的文件的内容是长下面三行那样，并且solver.jl也有修改，改变了输入参数的量还有一些东西
-    # para = ic_model.para[]
-    # func = ic_model.func[]
-    # res = get_data(T0, Tout, timefield, para, func)
+    innerheat = ic_model.innerheat[]
+    res = get_data(timefield, boundaryConditions, innerheat, p)
     len = length(res[1, 1, :])
     for i in 1:len
         ic_model.plot_data[] = [contourPlot(res[:, :, i])]
@@ -73,9 +133,10 @@ function ui(model::MyApp.MyPage)
     onany(model.value) do (_...)
         model.click[] += 1
         compute_data(model)
+        change(model)
     end
     #网页内容
-    page(model, class="container", title="Ai4Lab",
+    page(model, class="container", title="二维平板换热虚拟仿真实验室(Two Dimensional Plate Heat Transfer Virtual Simulation Laboratory)",
         head_content=Genie.Assets.favicon_support(),
         prepend=style(
             """
@@ -101,67 +162,6 @@ function ui(model::MyApp.MyPage)
             """
         ),
         [
-            heading("二维平板换热虚拟仿真实验室(Two Dimensional Plate Heat Transfer Virtual Simulation Laboratory)")
-            row([
-                cell(
-                    class="st-module",
-                    [
-                        h6("Initial Temperature: T0(℃)")
-                        #学长原本代码如下方注释
-                        # slider(1000:50:2000,
-                        #     @data(:T0);
-                        #     label=true)
-                        input("", placeholder="Input T0", @bind(:T0))#滑块改成输入框
-                    ]
-                )
-                cell(
-                    class="st-module",
-                    [
-                        h6("Environmental Temperature: Tout(℃)")
-                        # slider(0:50:500,
-                        #     @data(:Tout);
-                        #     label=true)
-                        input("", placeholder="Input Tout", @bind(:Tout))
-                    ]
-                )
-                cell(
-                    class="st-module",
-                    [
-                        h6("Coefficient of t: Para")
-                        # slider(0:0.1:2,
-                        #     @data(:para);
-                        #     label=true)
-                        input("", placeholder="Input para", @bind(:para))
-                    ]
-                )
-                cell(
-                    class="st-module",
-                    [
-                        h6("Time Domain(s)")
-                        # slider(40:20:400,
-                        #     @data(:timefield);
-                        #     label=true)
-                        input("", placeholder="Input timefield", @bind(:timefield))
-                    ]
-                )
-                cell(
-                    class="st-module",
-                    [
-                        h6("Change of Environmental Temperature")
-                        #input("", placeholder = "输入温度表达式:", @bind(:func))
-                    ]
-                )])
-            row([
-                btn("Simulation!", color="primary", textcolor="black", @click("value += 1"), [
-                    tooltip(contentclass="bg-indigo", contentstyle="font-size: 16px",
-                        style="offset: 10px 10px", "Click the button to start simulation")])
-                cell(
-                    class="st-module",
-                    [
-                        h6(["Simulation Times: ",
-                            span(model.click, @text(:click))])
-                    ])
-            ])
             row([
                 cell(
                     size=6,
@@ -171,13 +171,74 @@ function ui(model::MyApp.MyPage)
                         plot(:plot_data, layout=:layout, config="{ displayLogo:false }")
                     ]
                 )
-                cell(
-                    class="st-module",
-                    [
-                        h5("Result Data")
-                        table(:tableData; pagination=:credit_data_pagination, label=false, flat=true)
-                    ]
-                )
+                cell([
+                    cell(
+                        class="st-module",
+                        [
+                            h6("平板西边条件设置"),
+                            Stipple.select(:selection1,options=:selections),
+                            input("", placeholder = "请输入对流换热系数h", @bind(:h1),@showif(:showinput1)),
+                            input("", placeholder = "请输入关于t(时间)的表达式", @bind(:funcstr1))
+                        ]
+                    )
+                    cell(
+                        class="st-module",
+                        [
+                            h6("平板北边条件设置"),
+                            Stipple.select(:selection2,options=:selections),
+                            input("", placeholder = "请输入对流换热系数h", @bind(:h2),@showif(:showinput2)),
+                            input("", placeholder = "请输入关于t(时间)的表达式", @bind(:funcstr2))
+                        ]
+                    )
+                    cell(
+                        class="st-module",
+                        [
+                            h6("平板东边条件设置"),
+                            Stipple.select(:selection3,options=:selections),
+                            input("", placeholder = "请输入对流换热系数h", @bind(:h3),@showif(:showinput3)),
+                            input("", placeholder = "请输入关于t(时间)的表达式", @bind(:funcstr3))
+                        ]
+                    )
+                    cell(
+                        class="st-module",
+                        [
+                            h6("平板南边条件设置"),
+                            Stipple.select(:selection4,options=:selections),
+                            input("", placeholder = "请输入对流换热系数h", @bind(:h4),@showif(:showinput4)),
+                            input("", placeholder = "请输入关于t(时间)的表达式", @bind(:funcstr4))
+                        ]
+                    )
+                    cell(
+                        class="st-module",
+                        [
+                            h6("内热源设置"),
+                            input("", placeholder = "请输入关于t(时间)的表达式", @bind(:innerheat))
+                        ]
+                    )
+                    cell(
+                        class="st-module",
+                        [
+                            btn("Simulation!", color="primary", textcolor="black", @click("value += 1"), 
+                                [
+                                    tooltip(contentclass="bg-indigo", contentstyle="font-size: 16px",
+                                        style="offset: 10px 10px", "Click the button to start simulation")
+                                    h6(["Simulation Times: ",
+                                        span(model.click, @text(:click))])
+                                ]
+                            )
+                        ]
+                    )
+                ])
             ])
-        ])
+        ]  
+    )
 end
+
+
+#cell(
+    #class="st-module",
+    #[
+        #h5("Result Data")
+        #table(:tableData; pagination=:credit_data_pagination, label=false, flat=true)
+    #]
+#)
