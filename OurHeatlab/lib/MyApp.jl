@@ -8,7 +8,7 @@ using Stipple,StipplePlotly, StippleUI, DataFrames
 include("solver.jl")
 @reactive mutable struct MyPage <: ReactiveModel
     #1.初始化表格
-    tableData::R{DataTable} = DataTable(DataFrame(zeros(10,10), ["$i" for i in 1:10]))
+    tableData::R{DataTable} = DataTable(DataFrame(zeros(10, 10), ["$i" for i in 1:10]))
     #1.1.设置表格的显示方式(一页10行)
     credit_data_pagination::DataTablePagination = DataTablePagination(rows_per_page=10)
 
