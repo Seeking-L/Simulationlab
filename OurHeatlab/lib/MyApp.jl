@@ -132,8 +132,8 @@ function ui(model::MyApp.MyPage)
     #交互循环
     onany(model.value) do (_...)
         model.click[] += 1
-        compute_data(model)
         change(model)
+        compute_data(model)
     end
     #网页内容
     page(model, class="container", title="二维平板换热虚拟仿真实验室(Two Dimensional Plate Heat Transfer Virtual Simulation Laboratory)",
