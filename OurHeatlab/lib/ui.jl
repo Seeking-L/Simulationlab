@@ -36,8 +36,10 @@ function ui(model::MyApp.MyPage)
             row([
                 cell(
                     class="st-module", size=3,
+                    [
                     uploader(label="数据上传", :auto__upload, :multiple, method="POST",
                         url=SERVEURL, field__name="csv_file")
+                    ]
                 )
                 cell(
                     size=6,

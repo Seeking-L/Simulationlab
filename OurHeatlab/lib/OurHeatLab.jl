@@ -24,7 +24,7 @@ include("solver.jl") #传热学计算
 route("/", method=POST) do
     files = Genie.Requests.filespayload()
     for f in files
-        write(joinpath(FILE_PATH, f[2].name), f[2].data)
+        JSON3.write(joinpath(FILE_PATH, f[2].name), f[2].data)
         println()
         @info "Uploading: " * f[2].name
     end
