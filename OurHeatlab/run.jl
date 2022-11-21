@@ -7,8 +7,7 @@ Pkg.instantiate()
 
 using Revise
 
-# include("lib/MyApp.jl")
-include("lib/OurHeatLab.jl")
+include("lib/ui.jl")
 
 route("/") do
     MyApp.MyPage |> init |> ui |> html
