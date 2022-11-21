@@ -26,10 +26,10 @@ include("solver.jl")
     showinput2::R{Bool} = false
     showinput3::R{Bool} = false
     showinput4::R{Bool} = false
-    funcstr1::R{String} = "0"
-    funcstr2::R{String} = "0"
-    funcstr3::R{String} = "0"
-    funcstr4::R{String} = "0"
+    funcstr1::R{String} = "10*t"
+    funcstr2::R{String} = "10*t"
+    funcstr3::R{String} = "10*t"
+    funcstr4::R{String} = "10*t"
     h1::R{Float64} = 0.0
     h2::R{Float64} = 0.0
     h3::R{Float64} = 0.0
