@@ -2,18 +2,21 @@ using Stipple
 
 @reactive mutable struct Name <: ReactiveModel
   name::R{String} = "World!"
+  x::R{Float64} = 0.0
+  y::R{Float64} = 0.0
 end
 
 function ui(model)
   page( model, class="container", [
       h1([
         "Hello "
-        span("", @text(:name))
+        span(model.x, @text(:(Float64)(x+y)))
       ])
 
       p([
         "What is your name? "
-        input("", placeholder="Type your name", @bind(:name))
+        input("", placeholder="Type your name", @bind(:x))
+        input("", placeholder="Type your name", @bind(:y))
       ])
     ]
   )
