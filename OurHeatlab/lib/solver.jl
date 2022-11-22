@@ -1,5 +1,4 @@
 using DifferentialEquations: ODEProblem, solve, Tsit5
-
 #1.1.1热扩散系数
 dr = 1.27E-5
 #1.1.2密度
@@ -44,7 +43,7 @@ function f(i, j, n)
     return (i - 1) * n + j
 end
 
-function get_data(time::Float64, boundaryConditions::Vector{boundaryCondition}, innerheat::String, p::Vector{Float64},step::Vector)
+function get_data(u::Vector{Float64},time::Float64, boundaryConditions::Vector{boundaryCondition}, innerheat::String, p::Vector{Float64},step::Vector)
     #1.6.1设置内热源
     internalHeatSource = fcnFromString(innerheat)
     Tf1 = fcnFromString(boundaryConditions[1].Tf)
@@ -55,8 +54,10 @@ function get_data(time::Float64, boundaryConditions::Vector{boundaryCondition}, 
     m = trunc(Int,step[2])
     dx = step[3]
     dy = step[4]
+
     #4.初始化温度场
-    u0 = zeros(m*n)
+    u0=u
+    
     #3.DifferentialEquations所要求的问题表示函数,dT为一阶导数,T为温度函数,t为时间(自变量),p为常数
     #本例相当于把温度场离散化后,将各个格点温度视作时间的一元函数,共同建立一个一阶常微分方程组
     #以达到将偏微分方程(热传导方程)化简的目的.完全离散可能存在较大误差,故部分离散后可利用DifferentialEquations
@@ -348,7 +349,7 @@ function get_data(time::Float64, boundaryConditions::Vector{boundaryCondition}, 
     return res
 end
 
-get_data(time::Float64, boundaryConditions::Vector{boundaryCondition}, innerheat::String, p::Vector{Float64})=
-get_data(time::Float64, boundaryConditions::Vector{boundaryCondition}, innerheat::String, p::Vector{Float64},step)
+get_data(u::Vector{Float64},time::Float64, boundaryConditions::Vector{boundaryCondition}, innerheat::String, p::Vector{Float64})=
+get_data(u::Vector{Float64},time::Float64, boundaryConditions::Vector{boundaryCondition}, innerheat::String, p::Vector{Float64},step)
 #s = get_data(100.0,boundaryConditions,"0.0",p,step)
 #print(s[:,:,100])

@@ -18,15 +18,27 @@ function create_storage_dir(name)
     end
     return joinpath(@__DIR__, name)
 end
-
 # 创建文件夹函数
 const FILE_PATH = create_storage_dir("Data_Upload")
 
+# # 删除文件
+# function remove_data(model::MyApp.MyPage)
+#     files = sort(readdir(FILE_PATH))
+#     if files == String[]
+#         model.isSuccess[] = string(now()) * "—— 无数据文件!"
+#         return []
+#     end
+#     for i in readdir(FILE_PATH)
+#         rm(joinpath(FILE_PATH, i))
+#         @info "removing: " * joinpath(FILE_PATH, i)
+#     end
+#     model.isSuccess[] = string(now()) * "—— 删除$(prod(broadcast(x->" "*x*", ",files)))!"
+# end
 
 include("solver.jl")
 
 module MyApp
-using Stipple,StipplePlotly, StippleUI, DataFrames
+using Stipple, StipplePlotly, StippleUI, DataFrames
 include("solver.jl")
 @reactive mutable struct MyPage <: ReactiveModel
     #1.初始化表格
@@ -37,6 +49,7 @@ include("solver.jl")
     #2.交互所必要变量
     value::R{Int} = 0
     click::R{Int} = 0
+    # value_rm::R{Int} = 0
 
     #3.温度边界条件
     #3.2默认边界
@@ -193,8 +206,8 @@ function ui(model::MyApp.MyPage)
                 cell(
                     class="st-module", size=3,
                     [
-                    uploader(label="数据上传", :auto__upload, :multiple, method="POST",
-                        url=SERVEURL, field__name="csv_file")
+                        uploader(label="数据上传", :auto__upload, :multiple, method="POST",
+                            url=SERVEURL, field__name="csv_file")
                     ]
                 )
                 cell(
@@ -210,49 +223,49 @@ function ui(model::MyApp.MyPage)
                         class="st-module",
                         [
                             h6("平板西边条件设置"),
-                            Stipple.select(:selection1,options=:selections),
-                            input("", placeholder = "请输入对流换热系数h", @bind(:h1),@showif(:showinput1)),
-                            input("", placeholder = "请输入关于t(时间)的表达式", @bind(:funcstr1))
+                            Stipple.select(:selection1, options=:selections),
+                            input("", placeholder="请输入对流换热系数h", @bind(:h1), @showif(:showinput1)),
+                            input("", placeholder="请输入关于t(时间)的表达式", @bind(:funcstr1))
                         ]
                     )
                     cell(
                         class="st-module",
                         [
                             h6("平板北边条件设置"),
-                            Stipple.select(:selection2,options=:selections),
-                            input("", placeholder = "请输入对流换热系数h", @bind(:h2),@showif(:showinput2)),
-                            input("", placeholder = "请输入关于t(时间)的表达式", @bind(:funcstr2))
+                            Stipple.select(:selection2, options=:selections),
+                            input("", placeholder="请输入对流换热系数h", @bind(:h2), @showif(:showinput2)),
+                            input("", placeholder="请输入关于t(时间)的表达式", @bind(:funcstr2))
                         ]
                     )
                     cell(
                         class="st-module",
                         [
                             h6("平板东边条件设置"),
-                            Stipple.select(:selection3,options=:selections),
-                            input("", placeholder = "请输入对流换热系数h", @bind(:h3),@showif(:showinput3)),
-                            input("", placeholder = "请输入关于t(时间)的表达式", @bind(:funcstr3))
+                            Stipple.select(:selection3, options=:selections),
+                            input("", placeholder="请输入对流换热系数h", @bind(:h3), @showif(:showinput3)),
+                            input("", placeholder="请输入关于t(时间)的表达式", @bind(:funcstr3))
                         ]
                     )
                     cell(
                         class="st-module",
                         [
                             h6("平板南边条件设置"),
-                            Stipple.select(:selection4,options=:selections),
-                            input("", placeholder = "请输入对流换热系数h", @bind(:h4),@showif(:showinput4)),
-                            input("", placeholder = "请输入关于t(时间)的表达式", @bind(:funcstr4))
+                            Stipple.select(:selection4, options=:selections),
+                            input("", placeholder="请输入对流换热系数h", @bind(:h4), @showif(:showinput4)),
+                            input("", placeholder="请输入关于t(时间)的表达式", @bind(:funcstr4))
                         ]
                     )
                     cell(
                         class="st-module",
                         [
                             h6("内热源设置"),
-                            input("", placeholder = "请输入关于t(时间)的表达式", @bind(:innerheat))
+                            input("", placeholder="请输入关于t(时间)的表达式", @bind(:innerheat))
                         ]
                     )
                     cell(
                         class="st-module",
                         [
-                            btn("Simulation!", color="primary", textcolor="black", @click("value += 1"), 
+                            btn("Simulation!", color="primary", textcolor="black", @click("value += 1"),
                                 [
                                     tooltip(contentclass="bg-indigo", contentstyle="font-size: 16px",
                                         style="offset: 10px 10px", "Click the button to start simulation")
@@ -264,15 +277,15 @@ function ui(model::MyApp.MyPage)
                     )
                 ])
             ])
-        ]  
+        ]
     )
 end
 
 
 #cell(
-    #class="st-module",
-    #[
-        #h5("Result Data")
-        #table(:tableData; pagination=:credit_data_pagination, label=false, flat=true)
-    #]
+#class="st-module",
+#[
+#h5("Result Data")
+#table(:tableData; pagination=:credit_data_pagination, label=false, flat=true)
+#]
 #)

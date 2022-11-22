@@ -13,7 +13,7 @@ route("/") do
     MyApp.MyPage |> init |> ui |> html
 end
 
-up(8888)
+up(8888,open_browser = true)
 
 
 
