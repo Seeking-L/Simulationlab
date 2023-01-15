@@ -93,6 +93,21 @@ function ui(model::MyApp.MyPage)
               border-radius: 5px;
               box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.04);
             }
+          
+            .st-module1 {
+              marign: 20px 20px 20px 20px;
+              padding: 20px 20px 20px 20px;
+              background-color: #FFF;
+              border-radius: 5px;
+              box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.04);
+            }
+
+            .st-module2 {
+              width:10px;
+              height:100px;
+              marign: 20px;
+              border-radius: 5px;
+            }
 
             .stipple-core .st-module > h5,
             .stipple-core .st-module > h6 {
@@ -101,51 +116,97 @@ function ui(model::MyApp.MyPage)
             """
         ),
         [
-            heading("二维平板换热虚拟仿真实验室(Two Dimensional Plate Heat Transfer Virtual Simulation Laboratory)")
+            heading("二维平板换热虚拟仿真实验室(Two Dimensional Plate Heat Transfer Virtual Simulation Laboratory)")       
             row([
                 cell(
                     class="st-module",
-                    [
-                        h6("Initial Temperature: T0(℃)")
-                        slider(1000:50:2000,
-                            @data(:T0);
-                            label=true)
-                    ]
-                )
+                    btn("Handles click", push=true, color="primary", [
+                popupproxy([
+                    row([
+                        cell(
+                            class="st-module1",
+                            [
+                                h6("Initial Temperature: T0(℃)")
+                                slider(1000:50:2000,
+                                    @data(:T0);
+                                    label=true)
+                            ]
+                        )                    
+                        cell(
+                            class="st-module1",
+                            [
+                                h6("Environmental Temperature: Tout(℃)")
+                                slider(0:50:500,
+                                    @data(:Tout);
+                                    label=true)
+                            ]
+                        )
+                        cell(
+                            class="st-module1",
+                            [
+                                h6("Coefficient of t: Para")
+                                slider(0:0.1:2,
+                                    @data(:para);
+                                    label=true)
+                            ]
+                        )
+                        cell(
+                            class="st-module1",
+                            [
+                                h6("Time Domain(s)")
+                                slider(40:20:400,
+                                    @data(:timefield);
+                                    label=true)
+                            ]
+                        )
+                        ])
+                ])
+            ])
+           )
                 cell(
-                    class="st-module",
-                    [
-                        h6("Environmental Temperature: Tout(℃)")
-                        slider(0:50:500,
-                            @data(:Tout);
-                            label=true)
-                    ]
-                )
-                cell(
-                    class="st-module",
-                    [
-                        h6("Coefficient of t: Para")
-                        slider(0:0.1:2,
-                            @data(:para);
-                            label=true)
-                    ]
-                )
-                cell(
-                    class="st-module",
-                    [
-                        h6("Time Domain(s)")
-                        slider(40:20:400,
-                            @data(:timefield);
-                            label=true)
-                    ]
-                )
-                cell(
-                    class="st-module",
-                    [
-                        h6("Change of Environmental Temperature")
-                        #input("", placeholder = "输入温度表达式:", @bind(:func))
-                    ]
-                )])
+                    class="st-module1",
+                    btn("Handles click", push=true, color="primary", [
+                popupproxy([
+                    cell(
+                        class="st-module1",
+                        [
+                            h6("Initial Temperature: T0(℃)")
+                            slider(1000:50:2000,
+                                @data(:T0);
+                                label=true)
+                        ]
+                    )
+                        cell(
+                            class="st-module1",
+                            [
+                                h6("Environmental Temperature: Tout(℃)")
+                                slider(0:50:500,
+                                    @data(:Tout);
+                                    label=true)
+                            ]
+                        )
+                        cell(
+                            class="st-module1",
+                            [
+                                h6("Coefficient of t: Para")
+                                slider(0:0.1:2,
+                                    @data(:para);
+                                    label=true)
+                            ]
+                        )
+                        cell(
+                            class="st-module1",
+                            [
+                                h6("Time Domain(s)")
+                                slider(40:20:400,
+                                    @data(:timefield);
+                                    label=true)
+                            ]
+                        )
+                ])
+            ])
+           )
+        ])
             row([
                 btn("Simulation!", color="primary", textcolor="black", @click("value += 1"), [
                     tooltip(contentclass="bg-indigo", contentstyle="font-size: 16px",
@@ -158,6 +219,50 @@ function ui(model::MyApp.MyPage)
                     ])
             ])
             row([
+                cell(
+                    size=1,
+                    class="st-module2",
+                    btn("Handles click", push=true, color="primary", [
+                popupproxy([
+                    cell(
+                        class="st-module1",
+                        [
+                            h6("Initial Temperature: T0(℃)")
+                            slider(1000:50:2000,
+                                @data(:T0);
+                                label=true)
+                        ]
+                    )
+                        cell(
+                            class="st-module1",
+                            [
+                                h6("Environmental Temperature: Tout(℃)")
+                                slider(0:50:500,
+                                    @data(:Tout);
+                                    label=true)
+                            ]
+                        )
+                        cell(
+                            class="st-module1",
+                            [
+                                h6("Coefficient of t: Para")
+                                slider(0:0.1:2,
+                                    @data(:para);
+                                    label=true)
+                            ]
+                        )
+                        cell(
+                            class="st-module1",
+                            [
+                                h6("Time Domain(s)")
+                                slider(40:20:400,
+                                    @data(:timefield);
+                                    label=true)
+                            ]
+                        )
+                ])
+            ])
+           )
                 cell(
                     size=6,
                     class="st-module",
