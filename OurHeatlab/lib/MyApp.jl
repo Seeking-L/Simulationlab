@@ -80,7 +80,15 @@ function ui(model::MyApp.MyPage)
         prepend=style(
             """
             tr:nth-child(even) {
-              background: #F8F8F8 !important;
+              background: rgba(138,171,202,0.5) !important;
+            }
+
+            .bg-brand {
+                background: #11406c !important;
+            }
+
+            .text-brand {
+                color: #11406c !important;
             }
 
             .modebar {
@@ -88,25 +96,27 @@ function ui(model::MyApp.MyPage)
             }
 
             .st-module {
-              marign: 20px;
-              background-color: #FFF;
+              height: 600px;
+              width: 1300px;
+              position: relative;
+              left: 100px;
+
+              background-color: #fff;
+              padding: 40px 40px 40px 40px;
               border-radius: 5px;
               box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.04);
             }
           
             .st-module1 {
-              marign: 20px 20px 20px 20px;
               padding: 20px 20px 20px 20px;
-              background-color: #FFF;
+              background: rgba(255, 255, 255,0.9);
               border-radius: 5px;
               box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.04);
             }
 
             .st-module2 {
-              width:10px;
-              height:100px;
-              marign: 20px;
               border-radius: 5px;
+              box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.04);
             }
 
             .stipple-core .st-module > h5,
@@ -118,54 +128,8 @@ function ui(model::MyApp.MyPage)
         [
             heading("二维平板换热虚拟仿真实验室(Two Dimensional Plate Heat Transfer Virtual Simulation Laboratory)")       
             row([
-                cell(
-                    class="st-module",
-                    btn("Handles click", push=true, color="primary", [
-                popupproxy([
-                    row([
-                        cell(
-                            class="st-module1",
-                            [
-                                h6("Initial Temperature: T0(℃)")
-                                slider(1000:50:2000,
-                                    @data(:T0);
-                                    label=true)
-                            ]
-                        )                    
-                        cell(
-                            class="st-module1",
-                            [
-                                h6("Environmental Temperature: Tout(℃)")
-                                slider(0:50:500,
-                                    @data(:Tout);
-                                    label=true)
-                            ]
-                        )
-                        cell(
-                            class="st-module1",
-                            [
-                                h6("Coefficient of t: Para")
-                                slider(0:0.1:2,
-                                    @data(:para);
-                                    label=true)
-                            ]
-                        )
-                        cell(
-                            class="st-module1",
-                            [
-                                h6("Time Domain(s)")
-                                slider(40:20:400,
-                                    @data(:timefield);
-                                    label=true)
-                            ]
-                        )
-                        ])
-                ])
-            ])
-           )
-                cell(
-                    class="st-module1",
-                    btn("Handles click", push=true, color="primary", [
+
+                    btn("boundaries", push=true, outline=true,textcolor= "brand" ,[
                 popupproxy([
                     cell(
                         class="st-module1",
@@ -205,79 +169,39 @@ function ui(model::MyApp.MyPage)
                         )
                 ])
             ])
-           )
-        ])
-            row([
-                btn("Simulation!", color="primary", textcolor="black", @click("value += 1"), [
+                btn("Simulation!", outline=true,textcolor= "brand" ,  @click("value += 1"), [
                     tooltip(contentclass="bg-indigo", contentstyle="font-size: 16px",
                         style="offset: 10px 10px", "Click the button to start simulation")])
                 cell(
-                    class="st-module",
+                    class="st-module2",
                     [
                         h6(["Simulation Times: ",
                             span(model.click, @text(:click))])
                     ])
-            ])
-            row([
-                cell(
-                    size=1,
-                    class="st-module2",
-                    btn("Handles click", push=true, color="primary", [
-                popupproxy([
-                    cell(
-                        class="st-module1",
-                        [
-                            h6("Initial Temperature: T0(℃)")
-                            slider(1000:50:2000,
-                                @data(:T0);
-                                label=true)
-                        ]
-                    )
+
+                        btn("Table", push=true, color= "brand" ,size="10px",  [
+                    popupproxy([
                         cell(
                             class="st-module1",
                             [
-                                h6("Environmental Temperature: Tout(℃)")
-                                slider(0:50:500,
-                                    @data(:Tout);
-                                    label=true)
+                                h5("Result Data")
+                                table(:tableData; pagination=:credit_data_pagination, label=false, flat=true)
                             ]
                         )
-                        cell(
-                            class="st-module1",
-                            [
-                                h6("Coefficient of t: Para")
-                                slider(0:0.1:2,
-                                    @data(:para);
-                                    label=true)
-                            ]
-                        )
-                        cell(
-                            class="st-module1",
-                            [
-                                h6("Time Domain(s)")
-                                slider(40:20:400,
-                                    @data(:timefield);
-                                    label=true)
-                            ]
-                        )
+                    ])
+
                 ])
             ])
-           )
+
                 cell(
-                    size=6,
                     class="st-module",
                     [
                         h5("Result Plot")
                         plot(:plot_data, layout=:layout, config="{ displayLogo:false }")
                     ]
                 )
-                cell(
-                    class="st-module",
-                    [
-                        h5("Result Data")
-                        table(:tableData; pagination=:credit_data_pagination, label=false, flat=true)
-                    ]
-                )
+
+
+ 
             ])
-        ])
 end
