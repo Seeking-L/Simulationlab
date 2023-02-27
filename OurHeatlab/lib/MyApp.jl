@@ -14,7 +14,6 @@ using Stipple, StipplePlotly, StippleUI, DataFrames
     #2.交互所必要变量
     value::R{Int} = 0
     click::R{Int} = 0
-
     #3.温度边界条件
     #3.1可选的函数表单
     #func::R{Symbol} = :sin
@@ -66,7 +65,6 @@ function compute_data(ic_model::MyApp.MyPage)
     end
     nothing
 end
-
 #创建网页
 function ui(model::MyApp.MyPage)
     #交互循环
@@ -169,7 +167,7 @@ function ui(model::MyApp.MyPage)
                         )
                 ])
             ])
-                btn("Simulation!", outline=true,textcolor= "brand" ,  @click("value += 1"), [
+                btn("Simulation!", outline=true,textcolor= "brand" ,@click("value += 1"),[
                     tooltip(contentclass="bg-indigo", contentstyle="font-size: 16px",
                         style="offset: 10px 10px", "Click the button to start simulation")])
                 cell(
