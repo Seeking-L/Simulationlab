@@ -10,6 +10,12 @@ include("solver.jl")
     #2.交互所必要变量
     value::R{Int} = 0
     click::R{Int} = 0
+    # value_rm::R{Int} = 0
+
+    #4.初始化温度场
+    # m::R{Int} = 10
+    # n::R{Int} = 10
+    u0::R{Vector{Float64}} = zeros(100)
 
     #3.温度边界条件
     #3.2默认边界

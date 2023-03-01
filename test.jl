@@ -10,13 +10,12 @@ function ui(model)
   page( model, class="container", [
       h1([
         "Hello "
-        span(model.x, @text(:(Float64)(x+y)))
+        span("", @text(:name))
       ])
 
       p([
         "What is your name? "
-        input("", placeholder="Type your name", @bind(:x))
-        input("", placeholder="Type your name", @bind(:y))
+        input("", placeholder="Type your name", @bind(:name))
       ])
     ]
   )
