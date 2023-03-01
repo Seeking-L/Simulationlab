@@ -1,12 +1,14 @@
 include("support.jl")
-include("init.jl")
+# include("init.jl")
+using DelimitedFiles
 #创建网页
 function ui(model::MyApp.MyPage)
     #交互循环
     onany(model.value) do (_...)
         model.click[] += 1
-        if (sort(readdir(FILE_PATH)) != String[])
-            model.u0 = vec(float(open(readdlm, joinpath(FILE_PATH, "t1.txt"))))
+        if (sort(readdir("upload")) != String[]) #如果文件夹中不是空的
+            # model.u0 = vec(float(open(readdlm, joinpath(FILE_PATH, "t1.txt"))))
+            model.u0=Float32.(open(readdlm,joinpath("/upload", "file.txt")))
         end
         change(model)
         compute_data(model)
@@ -16,7 +18,7 @@ function ui(model::MyApp.MyPage)
     #     remove_data(model)
     # end
     #网页内容
-    page(model, class="container", title="二维平板换热虚拟仿真实验室(Two Dimensional Plate Heat Transfer Virtual
+    page(model, partial = true, class="container", title="二维平板换热虚拟仿真实验室(Two Dimensional Plate Heat Transfer Virtual
         Simulation Laboratory)",
         head_content=Genie.Assets.favicon_support(),
         prepend=style(
@@ -58,8 +60,8 @@ function ui(model::MyApp.MyPage)
                         #             style="offset: 10px 10px", "点击删除数据")
                         #     ]
                         # )
-                        uploader(label="初始温度上传", :auto__upload, :multiple, method="POST",
-                            url=SERVEURL, field__name="txt_file")
+                        uploader(label="上传初始温度", :auto__upload, :multiple, method="POST",
+                            url=SERVEURL, field__name="txt")
                     ]
                 )
             ])

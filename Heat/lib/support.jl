@@ -92,3 +92,5 @@ function compute_data(ic_model::MyApp.MyPage)
     end
     nothing
 end
+
+
