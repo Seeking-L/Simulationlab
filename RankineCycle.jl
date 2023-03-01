@@ -137,6 +137,7 @@ end
 function ui(model::testpage)
 
 	onany(model.mass_selection) do (_...)
+		model.click[]+=1
 		model.mass_number[] = xiabiao(mass_list,model.mass_selection[])
 		model.circle[] = computeRK(model.T1[],model.Tz[],model.pw[],model.reheat[],mass_list[model.mass_number[]])
 		model.str_work[] = @sprintf("%6.3f",model.circle[].work)
@@ -150,6 +151,7 @@ function ui(model::testpage)
 	end
 
 	onany(model.value) do (_...)
+		model.click[]+=1
 		model.circle[] = computeRK(model.T1[],model.Tz[],model.pw[],model.reheat[],mass_list[model.mass_number[]])
 		model.str_work[] = @sprintf("%6.3f",model.circle[].work)
 		model.str_efficiency[] = @sprintf("%2.2f",model.circle[].efficiency)
@@ -175,7 +177,7 @@ function ui(model::testpage)
           display: none!important;
         }
         .st-module {
-          marign: 20px;
+          marign: 10px;
           background-color: #FFF;
           border-radius: 5px;
           box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.04);
@@ -190,10 +192,10 @@ function ui(model::testpage)
 		row([
 			cell([checkbox(label="显示连续变化",fieldname=:continuity,dense=true)])
 			cell([checkbox(label="引入再热",fieldname=:reheat,dense=true)])
-			])
+		])
 		row([
 			cell(
-				class="st-module",
+				class="st-module",size=8,
 					[
 						h5("仿真结果：")
 						plot(:plot_data, layout=:layout, config="{ displayLogo:false }")
@@ -201,50 +203,71 @@ function ui(model::testpage)
 				)
     		cell([
 				cell(
+					cell(
 					class="st-module",
 						[
 							select(:mass_selection,options=:mass_selections)
 						]
+					)
 				)
-				cell(
-					class="st-module",
-						[
-							h6("输出净功:")
-							h6("",@text(:str_work))
-							h6("kJ/mol")
-							h6("循环热效率:")
-							h6("",@text(:str_efficiency))
-							h6("%")
-						]
-				)
-				cell(
-        			class="st-module",
-        				[
-            				h6("泵功(增压/MPa)")
-            				slider(0.5:0.01:3,
-                			@data(:pw);
-                			label=true)
-        				]
-    			)
-        		cell(
-		        	class="st-module",
-		        		[
-    		        		h6("冷却温度(K)")
-    		        		slider(280:350,
-        		        	@data(:T1);
-        		        	label=true)
-		        		]
-        		)
-        		cell(
-		        	class="st-module",
-		        		[
-    		        		h6("再热温度(K)",@showif(:reheat))
-    		        		slider(500:800,
-        		        	@data(:Tz),
-							@showif(:reheat),
-        		        	label=true)
-		        		]
-        		)
+				row([
+                        cell(
+                            class="st-module",
+                            [
+                                h6("&nbsp&nbsp 输出净功:&nbsp&nbsp")
+                                h6("", @text(:str_work))
+                                h6("&nbspkJ/mol")
+                            ])
+                    ])
+                    row([
+                        cell(
+                            class="st-module",
+                            [
+                                h6("&nbsp&nbsp 循环热效率:&nbsp&nbsp")
+                                h6("", @text(:str_efficiency))
+                                h6("&nbsp%")
+                            ])
+                        ])
+						row([
+							cell(
+								class="st-module",
+								[
+									h6("&nbsp&nbsp 循环热效率:&nbsp&nbsp")
+									h6("", @text(:str_efficiency))
+									h6("&nbsp%")
+								])
+							])
+						row([
+							cell(
+								class="st-module",
+								[
+									h6("&nbsp&nbsp 泵功(增压/MPa)")
+									slider(0.5:0.01:3, lazy=true,
+										@data(:pw);
+										label=true)
+								]
+							)])
+						row([
+							cell(
+								class="st-module",
+								[
+									h6("&nbsp&nbsp 冷却温度(K)")
+									slider(280:350,
+										@data(:T1);
+										label=true)
+								]
+							)])
+						row([
+							cell(
+								class="st-module",
+								[
+									h6("&nbsp&nbsp 再热温度(K)", @showif(:reheat))
+									slider(500:800,
+										@data(:Tz),
+										@showif(:reheat),
+										label=true)
+								]
+							)])
 				row([#2023-3-1
                         btn("Simulation!", color="primary", textcolor="black", @click("value += 1"),
                             [
@@ -264,4 +287,4 @@ route("/") do
     testpage |> init |> ui |> html
 end
 
-up(8888)
+up(8888,open_browser=true)
