@@ -34,7 +34,7 @@ route("/upload", method = POST) do
     end
 end
 
-up(8888,open_browser = true)
+up(8888)
 
 
 
