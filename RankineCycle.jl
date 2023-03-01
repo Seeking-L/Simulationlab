@@ -12,6 +12,10 @@ mutable struct xunhuan
 end
 
 @reactive mutable struct testpage <: ReactiveModel
+	#按钮所必要变量 2023-3-1
+    value::R{Int} = 0
+    click::R{Int} = 0
+
 	circle::R{xunhuan} = xunhuan(PlotData(),0.0,0.0)
 	plot_data::R{Vector{PlotData}} = [] 
 	layout::R{PlotLayout} = pl()
@@ -145,7 +149,7 @@ function ui(model::testpage)
 		end
 	end
 
-    onany(model.T1) do (_...)
+	onany(model.value) do (_...)
 		model.circle[] = computeRK(model.T1[],model.Tz[],model.pw[],model.reheat[],mass_list[model.mass_number[]])
 		model.str_work[] = @sprintf("%6.3f",model.circle[].work)
 		model.str_efficiency[] = @sprintf("%2.2f",model.circle[].efficiency)
@@ -155,43 +159,8 @@ function ui(model::testpage)
 		else
 			model.plot_data[] = [saturationline(mass_list[model.mass_number[]]),model.circle[].picture]
 		end
-    end
+	end
     
-	onany(model.pw) do (_...)
-		model.circle[] = computeRK(model.T1[],model.Tz[],model.pw[],model.reheat[],mass_list[model.mass_number[]])
-		model.str_work[] = @sprintf("%6.3f",model.circle[].work)
-		model.str_efficiency[] = @sprintf("%2.2f",model.circle[].efficiency)
-		model.plot_data[] = [saturationline(mass_list[model.mass_number[]])]
-		if model.continuity[]
-			model.plot_data[] = [model.plot_data[];model.circle[].picture]
-		else
-			model.plot_data[] = [saturationline(mass_list[model.mass_number[]]),model.circle[].picture]
-		end
-	end
-
-	onany(model.reheat) do (_...)
-		model.circle[] = computeRK(model.T1[],model.Tz[],model.pw[],model.reheat[],mass_list[model.mass_number[]])
-		model.str_work[] = @sprintf("%6.3f",model.circle[].work)
-		model.str_efficiency[] = @sprintf("%2.2f",model.circle[].efficiency)
-		model.plot_data[] = [saturationline(mass_list[model.mass_number[]])]
-		if model.continuity[]
-			model.plot_data[] = [model.plot_data[];model.circle[].picture]
-		else
-			model.plot_data[] = [saturationline(mass_list[model.mass_number[]]),model.circle[].picture]
-		end
-	end
-
-	onany(model.Tz) do (_...)
-		model.circle[] = computeRK(model.T1[],model.Tz[],model.pw[],model.reheat[],mass_list[model.mass_number[]])
-		model.str_work[] = @sprintf("%6.3f",model.circle[].work)
-		model.str_efficiency[] = @sprintf("%2.2f",model.circle[].efficiency)
-		model.plot_data[] = [saturationline(mass_list[model.mass_number[]])]
-		if model.continuity[]
-			model.plot_data[] = [model.plot_data[];model.circle[].picture]
-		else
-			model.plot_data[] = [saturationline(mass_list[model.mass_number[]]),model.circle[].picture]
-		end
-	end
 
     page(model,
         class="container",
@@ -276,6 +245,16 @@ function ui(model::testpage)
         		        	label=true)
 		        		]
         		)
+				row([#2023-3-1
+                        btn("Simulation!", color="primary", textcolor="black", @click("value += 1"),
+                            [
+                                tooltip(contentclass="bg-indigo", contentstyle="font-size: 16px",
+                                    style="offset: 1000px 1000px", "Click the button to start simulation")
+                                h6(["&nbsp&nbspTimes: ",
+                                    span(model.click, @text(:click))])
+                            ]
+                        )
+                ])
     		])
 		])
 	])
