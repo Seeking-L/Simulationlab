@@ -287,4 +287,4 @@ route("/") do
     testpage |> init |> ui |> html
 end
 
-up(8888,open_browser=true)
+up(8889)

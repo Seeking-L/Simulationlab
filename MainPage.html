@@ -28,10 +28,26 @@
 
         .container {
             display: flex;
-            flex-direction: column;
+            flex-wrap: wrap;
             align-items: center;
             justify-content: center;
             height: calc(100vh - 80px);
+            gap: 30px;
+            padding: 0 20px;
+        }
+
+        .column {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            background-color: #fff;
+            color: #003366;
+            border-radius: 5px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+            padding: 30px;
+            text-align: center;
         }
 
         .link {
@@ -60,8 +76,21 @@
         <h1>仿真实验室</h1>
     </header>
     <div class="container">
-        <a href="http://localhost:8889/ " target="_blank" class="link">朗肯循环</a>
-        <a href="http://localhost:8888/" target="_blank" class="link">二维平板传热</a>
+        <div class="column">
+            <p>abcde</p>
+            <a href="http://127.0.0.1:8888" target="_blank" class="link">二维平板传热</a>
+            <p>abcde</p>
+        </div>
+        <div class="column">
+            <p>abcde</p>
+            <a href="http://127.0.0.1:8889" target="_blank" class="link">朗肯循环</a>
+            <p>abcde</p>
+        </div>
+        <div class="column">
+            <p>未完待续</p>
+            <p>。。。。。。。
+            </p>
+        </div>
     </div>
 </body>
 
