@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>仿真实验室</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        body {
+            font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+            background-color: #f0f0f0;
+            margin: 0;
+            padding: 0;
+        }
+
+        header {
+            background-color: #003366;
+            color: #fff;
+            padding: 20px;
+            text-align: center;
+        }
+
+        h1 {
+            font-size: 50px;
+            margin-top: 0;
+            margin-bottom: 0;
+        }
+
+        .container {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            justify-content: center;
+            height: calc(100vh - 80px);
+            gap: 30px;
+            padding: 0 20px;
+        }
+
+        .column {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+            justify-content: center;
+            background-color: #fff;
+            color: #003366;
+            border-radius: 5px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+            padding: 30px;
+            text-align: center;
+        }
+
+        .link {
+            margin-top: 20px;
+            padding: 10px 20px;
+            background-color: #fff;
+            color: #003366;
+            font-size: 24px;
+            border-radius: 5px;
+            text-decoration: none;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+            transition: all 0.2s ease-in-out;
+        }
+
+        .link:hover {
+            background-color: #003366;
+            color: #fff;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+            transform: scale(1.05);
+        }
+    </style>
+</head>
+
+<body>
+    <header>
+        <h1>仿真实验室</h1>
+    </header>
+    <div class="container">
+        <div class="column">
+            <a href="http://127.0.0.1:8888" target="_blank" class="link">二维平板传热实验室</a>
+            <p>灵活设置多种参数(如：边界条件)<br>动态展示二维平板传热过程</p>
+        </div>
+        <div class="column">
+            <a href="http://127.0.0.1:8889" target="_blank" class="link">朗肯循环实验室</a>
+            <p>设置不同工质压强及温度的参数值<br>展示温熵图及输出功、循环效率</p>
+        </div>
+        <div class="column">
+            <p>未完待续</p>
+            <p>Explore More Possibilities!
+            </p>
+        </div>
+    </div>
+</body>
+
+</html>
