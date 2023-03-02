@@ -142,7 +142,7 @@ function ui(model::testpage)
         model.circle[] = computeRK(model.T1[], model.Tz[], model.pw[], model.reheat[], mass_list[model.mass_number[]])
         model.str_work[] = @sprintf("%6.3f", model.circle[].work)
         model.str_efficiency[] = @sprintf("%2.2f", model.circle[].efficiency)
-        model.plot_data[] = [saturationline(mass_list[model.mass_number[]])]
+        # model.plot_data[] = [saturationline(mass_list[model.mass_number[]])]
         if model.continuity[]
             model.plot_data[] = [model.plot_data[]; model.circle[].picture]
         else
@@ -155,7 +155,7 @@ function ui(model::testpage)
         model.circle[] = computeRK(model.T1[], model.Tz[], model.pw[], model.reheat[], mass_list[model.mass_number[]])
         model.str_work[] = @sprintf("%6.3f", model.circle[].work)
         model.str_efficiency[] = @sprintf("%2.2f", model.circle[].efficiency)
-        model.plot_data[] = [saturationline(mass_list[model.mass_number[]])]
+        # model.plot_data[] = [saturationline(mass_list[model.mass_number[]])]
         if model.continuity[]
             model.plot_data[] = [model.plot_data[]; model.circle[].picture]
         else
