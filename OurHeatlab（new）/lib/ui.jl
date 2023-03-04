@@ -1,5 +1,12 @@
 include("support.jl")
 include("init.jl")
+using Genie, Stipple, StippleUI
+using Genie.Requests, Genie.Renderer
+
+Genie.config.cors_headers["Access-Control-Allow-Origin"] = "*"
+Genie.config.cors_headers["Access-Control-Allow-Headers"] = "Content-Type"
+Genie.config.cors_headers["Access-Control-Allow-Methods"] = "GET,POST,PUT,DELETE,OPTIONS"
+Genie.config.cors_allowed_origins = ["*"]
 #创建网页
 function ui(model::MyApp.MyPage)
     #交互循环
@@ -7,7 +14,7 @@ function ui(model::MyApp.MyPage)
         model.click[] += 1
         change(model)
         if (sort(readdir(FILE_PATH)) != String[])
-            model.u0[] = vec(float(open(readdlm, joinpath(FILE_PATH, "t1.txt"))))
+            model.u0[] = vec(float(open(readdlm, joinpath(FILE_PATH, "file.txt"))))
         end
         if length(model.u0[]) != model.h[5]*model.h[6]
             @info "初值数组长度与格点数目不匹配,请检查!程序将以零初值计算!"
@@ -134,10 +141,9 @@ function ui(model::MyApp.MyPage)
                 )
                 uploader(label="初始温度上传", 
                     :auto__upload, 
-                    :multiple, 
                     method="POST",
                     url=SERVEURL, 
-                    field__name="txt_file",
+                    field__name="txt",
                     color="brand"
                 )
             ])
