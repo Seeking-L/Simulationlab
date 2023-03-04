@@ -7,13 +7,11 @@ function ui(model::MyApp.MyPage)
         model.click[] += 1
         change(model)
         if (sort(readdir(FILE_PATH)) != String[])
-            u0 = vec(float(open(readdlm, joinpath(FILE_PATH, "t1.txt"))))
-            if length(u0) == model.h[5]*model.h[6]
-                model.u0[] = u0
-            else
-                @info "初值数组长度与格点数目不匹配,请检查!程序将以零初值计算!"
-                model.u0[] = zeros(trunc(Int,model.h[5]*model.h[6]))
-            end
+            model.u0[] = vec(float(open(readdlm, joinpath(FILE_PATH, "t1.txt"))))
+        end
+        if length(model.u0[]) != model.h[5]*model.h[6]
+            @info "初值数组长度与格点数目不匹配,请检查!程序将以零初值计算!"
+            model.u0[] = zeros(trunc(Int,model.h[5]*model.h[6]))
         end
         compute_data(model)
     end
