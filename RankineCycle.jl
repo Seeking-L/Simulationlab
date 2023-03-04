@@ -144,9 +144,9 @@ function ui(model::testpage)
         model.str_efficiency[] = @sprintf("%2.2f", model.circle[].efficiency)
         # model.plot_data[] = [saturationline(mass_list[model.mass_number[]])]
         if model.continuity[]
-            model.plot_data[] = [model.plot_data[]; model.circle[].picture]
+            model.plot_data[] = [saturationline(mass_list[model.mass_number[]]);model.plot_data[]; model.circle[].picture]
         else
-            model.plot_data[] = [saturationline(mass_list[model.mass_number[]]), model.circle[].picture]
+            model.plot_data[] = [saturationline(mass_list[model.mass_number[]]); model.circle[].picture]
         end
     end
 
@@ -157,9 +157,9 @@ function ui(model::testpage)
         model.str_efficiency[] = @sprintf("%2.2f", model.circle[].efficiency)
         # model.plot_data[] = [saturationline(mass_list[model.mass_number[]])]
         if model.continuity[]
-            model.plot_data[] = [model.plot_data[]; model.circle[].picture]
+            model.plot_data[] = [saturationline(mass_list[model.mass_number[]]);model.plot_data[]; model.circle[].picture]
         else
-            model.plot_data[] = [saturationline(mass_list[model.mass_number[]]), model.circle[].picture]
+            model.plot_data[] = [saturationline(mass_list[model.mass_number[]]); model.circle[].picture]
         end
     end
 
