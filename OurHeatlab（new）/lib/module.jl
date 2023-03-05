@@ -10,6 +10,7 @@ include("solver.jl")
     #2.交互所必要变量
     value::R{Int} = 0
     click::R{Int} = 0
+    isloading::R{Bool} = false
     # value_rm::R{Int} = 0
 
     #4.初始化温度场
