@@ -7,6 +7,7 @@ Genie.config.cors_headers["Access-Control-Allow-Origin"] = "*"
 Genie.config.cors_headers["Access-Control-Allow-Headers"] = "Content-Type"
 Genie.config.cors_headers["Access-Control-Allow-Methods"] = "GET,POST,PUT,DELETE,OPTIONS"
 Genie.config.cors_allowed_origins = ["*"]
+
 #创建网页
 function ui(model::MyApp.MyPage)
     btn1 = btn("开始计算", loading=:isloading,
@@ -31,7 +32,8 @@ function ui(model::MyApp.MyPage)
             model.u0[] = vec(float(open(readdlm, joinpath(FILE_PATH, "file.txt"))))
         end
         if length(model.u0[]) != model.h[5] * model.h[6]
-            @info "初值数组长度与格点数目不匹配,请检查!程序将以零初值计算!"
+            @info "初值数组长度与格点数目不匹配, 请检查!  程序将以零初值计算!"
+            notify(model,"初值数组长度与格点数目不匹配, 请检查!  程序将以零初值计算!")
             model.u0[] = zeros(trunc(Int, model.h[5] * model.h[6]))
         end
         compute_data(model)

@@ -36,6 +36,7 @@ route("/Data_Upload", method = POST) do
       end
     else
       @info "No file uploaded"
+      notify(MyApp.MyPage,"No file uploaded")
     end
   end
 
