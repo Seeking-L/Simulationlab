@@ -98,9 +98,11 @@ function compute_data(model::MyApp.MyPage)
                 DataFrame(round.(res[:, :, i], digits=2), ["$j" for j in 1:trunc(Int,model.h[5])]))
             sleep(1 / 30)
         end
-        @info "仿真成功,请检查结果!"
+        @info "仿真成功, 请检查结果!"
+        notify(model,"仿真成功, 请检查结果!")
     catch e
         @info "计算失败!请检查初值条件,或调整计算步长!"
+        notify(model,"计算失败!  请检查初值条件,或调整计算步长!")
     end
     nothing
 end
