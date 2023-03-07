@@ -33,3 +33,22 @@ route("/", method=POST) do
     return "upload done"
 end
 
+# #解析文件名
+# function get_file_name(name::String)
+#     posi = getproperty(findfirst(".txt", name), :start)
+#     return name[1:posi-1]
+# end
+
+# # 删除文件
+# function remove_data(model::MyApp.MyPage)
+#     files = sort(readdir(FILE_PATH))
+#     if files == String[]
+#         model.isSuccess[] = string(now()) * "—— 无数据文件!"
+#         return []
+#     end
+#     for i in readdir(FILE_PATH)
+#         rm(joinpath(FILE_PATH, i))
+#         @info "removing: " * joinpath(FILE_PATH, i)
+#     end
+#     model.isSuccess[] = string(now()) * "—— 删除$(prod(broadcast(x->" "*x*", ",files)))!"
+# end

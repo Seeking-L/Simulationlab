@@ -1,13 +1,11 @@
 using Pkg
 
-const SERVEURL = "http://localhost:8888/"  # 本地运行地址
-
 Pkg.activate(".")
 Pkg.instantiate()
 
-using Revise
-
 include("lib/ui.jl")
+
+const SERVEURL = "http://localhost:8888/"  # 本地运行地址
 
 route("/") do
     MyApp.MyPage |> init |> ui |> html

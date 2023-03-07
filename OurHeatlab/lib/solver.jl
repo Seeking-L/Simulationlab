@@ -184,9 +184,9 @@ function get_data(u::Vector{Float64},time::Float64, boundaryConditions::Vector{b
             end
             if boundaryConditions[4].serialNumber == 1
                 bt4 = fcnFromString(boundaryConditions[4].bt)
-                T[f(n, 1, n)] = (bt1(t) + bt4(t))/2
+                T[f(m, 1, n)] = (bt1(t) + bt4(t))/2
             else
-                T[f(n, 1, n)] = bt1(t)
+                T[f(m, 1, n)] = bt1(t)
             end
         elseif boundaryConditions[1].serialNumber == 2
             qw1 = fcnFromString(boundaryConditions[1].qw)
@@ -337,9 +337,9 @@ function get_data(u::Vector{Float64},time::Float64, boundaryConditions::Vector{b
     sol = solve(prob, Tsit5())
     #6.数值解的规范化
     an_len = length(sol.u)
-    res = zeros(n, n, an_len)
+    res = zeros(m, n, an_len)
     for t in 1:an_len
-        for i in 1:n
+        for i in 1:m
             for j in 1:n
                 res[i, j, t] = sol.u[t][f(i, j, n)]
             end
@@ -348,8 +348,3 @@ function get_data(u::Vector{Float64},time::Float64, boundaryConditions::Vector{b
     #7.结束
     return res
 end
-
-get_data(u::Vector{Float64},time::Float64, boundaryConditions::Vector{boundaryCondition}, innerheat::String, p::Vector{Float64})=
-get_data(u::Vector{Float64},time::Float64, boundaryConditions::Vector{boundaryCondition}, innerheat::String, p::Vector{Float64},step)
-#s = get_data(100.0,boundaryConditions,"0.0",p,step)
-#print(s[:,:,100])
