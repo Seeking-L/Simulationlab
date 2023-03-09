@@ -16,6 +16,7 @@ struct StepError <: Exception end
     #按钮所必要变量 2023-3-1
     value::R{Int} = 0
     click::R{Int} = 0
+    isloading::R{Bool} = false
 
     circle::R{xunhuan} = xunhuan(PlotData(), 0.0, 0.0)
     plot_data::R{Vector{PlotData}} = []
@@ -143,101 +144,97 @@ end
 function computeRK(T1::Float64, Tz::Float64, pw::Float64, reheat::Bool, mass::Mass, picture::Bool)
     c = xunhuan(PlotData(), 0.0, 0.0)
     x = [3, 1]
-    x2 = 1
+    x2 = [1,1]
     p0 = PropsSI("P", "T", T1, "Q", 1, mass.hname) / 10^6
     Ti = 0
-    try
-        if picture
-            s = [PropsSI("S", "T", T1, "Q", 1, mass.hname), PropsSI("S", "T", T1, "Q", 0, mass.hname), PropsSI("S", "T", T1, "Q", 0, mass.hname)]
-            T = [T1, T1]
-            str = "基础理想朗肯循环"
-            S1(t) = PropsSI("S", "T", t, "P|liquid", (p0 + pw) * 10^6, mass.hname) - s[2]
-            t0 = solveeqution(S1, 0.001, 0.1, T1)
-            T = [T; t0:PropsSI("T", "P", (p0 + pw) * 10^6, "Q", 0, mass.hname)]
-            s = [s; PropsSI.("S", "T", T[4:end], "P|liquid", (p0 + pw) * 10^6, mass.hname)]
-            T = [T; PropsSI("T", "P", (p0 + pw) * 10^6, "Q", 1, mass.hname)]
-            s = [s; PropsSI("S", "P", (p0 + pw) * 10^6, "Q", 1, mass.hname)]
-            S2(x) = PropsSI("S", "T|gas", x, "P", (p0 + pw) * 10^6, mass.hname) - s[1]
-            t0 = T[end]
-            T2 = solveeqution(S2, 0.1, 0.1, t0)
-            T = [T; t0:T2]
-            s = [s; PropsSI.("S", "T|gas", t0:T2, "P", (p0 + pw) * 10^6, mass.hname)]
-            s[end] = PropsSI("S", "T", T1, "Q", 1, mass.hname)
+    if picture
+        s = [PropsSI("S", "T", T1, "Q", 1, mass.hname), PropsSI("S", "T", T1, "Q", 0, mass.hname), PropsSI("S", "T", T1, "Q", 0, mass.hname)]
+        T = [T1, T1]
+        str = "基础理想朗肯循环"
+        S1(t) = PropsSI("S", "T", t, "P|liquid", (p0 + pw) * 10^6, mass.hname) - s[2]
+        t0 = solveeqution(S1, 0.001, 0.1, T1)
+        T = [T; t0:PropsSI("T", "P", (p0 + pw) * 10^6, "Q", 0, mass.hname)]
+        s = [s; PropsSI.("S", "T", T[4:end], "P|liquid", (p0 + pw) * 10^6, mass.hname)]
+        T = [T; PropsSI("T", "P", (p0 + pw) * 10^6, "Q", 1, mass.hname)]
+        s = [s; PropsSI("S", "P", (p0 + pw) * 10^6, "Q", 1, mass.hname)]
+        S2(x) = PropsSI("S", "T|gas", x, "P", (p0 + pw) * 10^6, mass.hname) - s[1]
+        t0 = T[end]
+        T2 = solveeqution(S2, 0.1, 0.1, t0)
+        T = [T; t0:T2]
+        s = [s; PropsSI.("S", "T|gas", t0:T2, "P", (p0 + pw) * 10^6, mass.hname)]
+        s[end] = PropsSI("S", "T", T1, "Q", 1, mass.hname)
+        x[2] = length(T)
+        if reheat
+            S3(p) = PropsSI("S", "T|gas", Tz, "P", p * 10^6, mass.hname) - s[1]
+            p = solveeqution(S3, 0.01, 0.1, p0)
+            T = [T; Tz:T2]
+            s = [s; PropsSI.("S", "T|gas", Tz:T2, "P", p * 10^6, mass.hname)]
             x[2] = length(T)
-            if reheat
-                S3(p) = PropsSI("S", "T|gas", Tz, "P", p * 10^6, mass.hname) - s[1]
-                p = solveeqution(S3, 0.01, 0.1, p0)
-                T = [T; Tz:T2]
-                s = [s; PropsSI.("S", "T|gas", Tz:T2, "P", p * 10^6, mass.hname)]
-                x[2] = length(T)
-                T = [T; T1]
-                s = [s; PropsSI("S", "T|gas", T2, "P", p * 10^6, mass.hname)]
-                str = "带有再热的理想朗肯循环"
-            end
             T = [T; T1]
-            s = [s; PropsSI("S", "T", T1, "Q", 1, mass.hname)] / 1000
-            c.work = integral(s, T)
-            c.efficiency = c.work / integral(s[x[1]:x[2]], T[x[1]:x[2]]) * 100
-            c.picture = PlotData(x=s, y=T, name=str)
-        else
-            str = "基础理想朗肯循环"
-            v = [1/PropsSI("D", "T", T1, "Q", 1, mass.hname), 1/PropsSI("D", "T", T1, "Q", 0, mass.hname)]
-            p = [p0;PropsSI("P", "T", T1, "Q", 0, mass.hname)/10^6:0.1:(p0+pw)]
-            s1 = PropsSI("S","T",T1,"Q",0,mass.hname)
-            s2 = PropsSI("S","T",T1,"Q",1,mass.hname)
-            for i in p[3:end]
-                Sp1(t) = PropsSI("S","T",t,"P|liquid",i*10^6,mass.hname) - s1
-                Ti = solveeqution(Sp1,0.001,0.1,T1)
-                v = [v;1/PropsSI("D","T",Ti,"P|liquid",i*10^6,mass.hname)]
-            end
-            x2 = length(p)
-            T0 = PropsSI("T","P",(p0+pw)*10^6,"Q",1,mass.hname)
-            Ti = T0 + 0.1
-            Tj = Tz + 0.1
-            for i = (p0+pw):-0.2:p0
-                Tir = Ti
-                p = [p;i]
-                Sp2(t) = PropsSI("S","T|gas",t,"P",i*10^6,mass.hname) - s2
-                if Ti < T0
-                    Ti = solveeqution(Sp2,-0.1,0.1,T0)
-                else
-                    Ti = solveeqution(Sp2,0.1,0.1,T0)
-                end
-                if reheat
-                    str = "带有再热的理想朗肯循环"
-                    if (Tir > Tz) && (Ti < Tz)
-                        p = [p;i]
-                        v = [v;1/PropsSI("D","T|gas",Ti,"P",i*10^6,mass.hname);1/PropsSI("D","T|gas",Tz,"P",i*10^6,mass.hname)]
-                        s3 = PropsSI("S","T|gas",Tz,"P",i*10^6,mass.hname)
-                        for j = i:-0.2:p0
-                            p = [p;j]
-                            Sp3(t) = PropsSI("S","T|gas",t,"P",j*10^6,mass.hname) - s3
-                            if Tj < Tz
-                                Tj = solveeqution(Sp3,-0.1,0.1,Tz)
-                            else
-                                Tj = solveeqution(Sp3,0.1,0.1,Tz)
-                            end
-                            v = [v;1/PropsSI("D","T|gas",Tj,"P",j*10^6,mass.hname)]
-                        end
-                        break
-                    end
-                    Tir = Ti
-                else
-                    v = [v;1/PropsSI("D","T|gas",Ti,"P",i*10^6,mass.hname)]
-                end
-            end
+            s = [s; PropsSI("S", "T|gas", T2, "P", p * 10^6, mass.hname)]
+            str = "带有再热的理想朗肯循环"
+        end
+        T = [T; T1]
+        s = [s; PropsSI("S", "T", T1, "Q", 1, mass.hname)] / 1000
+        c.work = integral(s, T)
+        c.efficiency = c.work / integral(s[x[1]:x[2]], T[x[1]:x[2]]) * 100
+        c.picture = PlotData(x=s, y=T, name=str)
+    else
+        str = "基础理想朗肯循环"
+        h3 = PropsSI("H","T",T1,"Q",1,mass.hname)/1000
+        h4 = PropsSI("H","T",T1,"Q",0,mass.hname)/1000
+        v = [1/PropsSI("D", "T", T1, "Q", 1, mass.hname), 1/PropsSI("D", "T", T1, "Q", 0, mass.hname)]
+        p = [p0;PropsSI("P", "T", T1, "Q", 0, mass.hname)/10^6:0.1:(p0+pw)]
+        p = [p;(p0+pw)]
+        s1 = PropsSI("S","T",T1,"Q",0,mass.hname)
+        s2 = PropsSI("S","T",T1,"Q",1,mass.hname)
+        for i in p[3:end]
+            Sp1(t) = PropsSI("S","T",t,"P|liquid",i*10^6,mass.hname) - s1
+            Ti = solveeqution(Sp1,0.001,0.1,T1)
+            v = [v;1/PropsSI("D","T",Ti,"P|liquid",i*10^6,mass.hname)]
+        end
+        h1 = PropsSI("H","T",Ti,"P|liquid",(p0+pw)*10^6,mass.hname)/1000
+        x2[1] = length(p)
+        T0 = PropsSI("T","P",(p0+pw)*10^6,"Q",1,mass.hname)
+        Sp2(t) = PropsSI("S","T|gas",t,"P",(p0+pw)*10^6,mass.hname) - s2        
+        Ti = solveeqution(Sp2,0.1,0.1,T0)
+        h2 = PropsSI("H","T|gas",Ti,"P",(p0+pw)*10^6,mass.hname)/1000
+        vi = 1/PropsSI("D","T|gas",Ti,"P",(p0+pw)*10^6,mass.hname)
+        k = PropsSI("CPMASS","T|gas",Ti,"P",(p0+pw)*10^6,mass.hname)/PropsSI("CVMASS","T|gas",Ti,"P",(p0+pw)*10^6,mass.hname)
+        c0 = (p0+pw)*vi^k
+        if reheat
+            str = "带有再热的理想朗肯循环"
+            Sp3(p) = PropsSI("S","T|gas",Tz,"P",p*10^6,mass.hname) - s2
+            pj0 = PropsSI("P","T",Tz,"Q",1,mass.hname)/10^6
+            pj = solveeqution(Sp3,-0.1,0.1,pj0)
+            h5 = PropsSI("H","T|gas",Tz,"P",pj*10^6,mass.hname)/1000
+            p = [p;(p0+pw):-0.1:pj]
+            v = [(c0 ./ ((p0+pw):-0.1:pj)) .^ (1/k)]
+            p = [p;pj]
+            v = [(c0/pj)^(1/k)]
+            vj = 1/PropsSI("D","T|gas",Ti,"P",pj*10^6,mass.hname)
+            h6 = PropsSI("H","T|gas",Ti,"P",pj*10^6,mass.hname)/1000
+            k1 = PropsSI("CPMASS","T|gas",Ti,"P",pj*10^6,mass.hname)/PropsSI("CVMASS","T|gas",Ti,"P",pj*10^6,mass.hname)
+            c1 = pj*vj^k1
+            p = [p;pj:-0.1:p0]
+            v = [v;(c1 ./ (pj:-0.1:p0)) .^ (1/k1)]
             p = [p;p0]
-            v = [v;1/PropsSI("D","P",p0*10^6,"Q",1,mass.hname)]
-            c.work = integral(v, p)*1000
-            c.efficiency = c.work / integral(v[x2:end], p[x2:end]) * 100
-            c.picture = PlotData(x=v, y=p, name=str)
+            v = [(c1/p0)^(1/k1)]
+            q = h2 - h1 + h6 - h5
+            w = h2 - h5 + h6 - h3 - (h1 - h4)
+        else
+            p = [p;(p0+pw):-0.1:p0]
+            v = [v;(c0 ./ ((p0+pw):-0.1:p0)) .^ (1/k)]
+            p = [p;p0]
+            v = [v;(c0/p0)^(1/k)]
+            q = h2 - h1
+            w = h2 - h3 - (h1 - h4)
         end
-    catch e
-        if isa(e,StepError)
-            @info "警告!迭代步数过多,程序停止计算!建议改变参数,重新计算!"
-        elseif isa(e,ErrorException)
-            @info "错误!温度或压强超出了范围,请调整为合适值再做计算!"
-        end
+        p = [p;p0]
+        v = [v;1/PropsSI("D","P",p0*10^6,"Q",1,mass.hname)]
+        c.work = w
+        c.efficiency = c.work / q * 100
+        c.picture = PlotData(x=v, y=p, name=str)
     end
     return c
 end
@@ -249,10 +246,35 @@ function xiabiao(array::Vector{Mass}, value::String)
 end
 
 function ui(model::testpage)
+    btn1 = btn("开始计算", 
+                loading=:isloading,
+                color="primary",
+                textcolor="white",
+                size="15px",
+                @click("value += 1"),
+                [
+                    tooltip(contentclass="bg-indigo",
+                        contentstyle="font-size: 16px",
+                        style="offset: 1000px 1000px",
+                        "点击按钮以开始仿真"
+                    )
+                ]
+            )
 
     onany(model.mass_selection) do (_...)
+        model.isloading[] = true
         model.mass_number[] = xiabiao(mass_list, model.mass_selection[])
-        model.circle[] = computeRK(model.T1[], model.Tz[], model.pw[], model.reheat[], mass_list[model.mass_number[]], model.picture[])
+        try 
+            model.circle[] = computeRK(model.T1[], model.Tz[], model.pw[], model.reheat[], mass_list[model.mass_number[]], model.picture[])
+        catch e
+            if isa(e,StepError)
+                @info "警告!迭代步数过多,程序停止计算!建议改变参数,重新计算!"
+                notify(model,"警告!迭代步数过多,程序停止计算!建议改变参数,重新计算!")
+            elseif isa(e,ErrorException)
+                @info "错误!温度或压强超出了范围,请调整为合适值再做计算!"
+                notify(model,"错误!温度或压强超出了范围,请调整为合适值再做计算!")
+            end
+        end
         model.str_work[] = @sprintf("%6.3f", model.circle[].work)
         model.str_efficiency[] = @sprintf("%2.2f", model.circle[].efficiency)
         model.plot_data[] = [saturationline(mass_list[model.mass_number[]], model.picture[])]
@@ -261,11 +283,23 @@ function ui(model::testpage)
         else
             model.plot_data[] = [saturationline(mass_list[model.mass_number[]], model.picture[]), model.circle[].picture]
         end
+        model.isloading[] = false
     end
 
     onany(model.picture) do (_...)
+        model.isloading[] = true
         model.str_picture == "示热图" ? (model.str_picture = "示功图"; model.layout[] = plPV()) : (model.str_picture = "示热图"; model.layout[] = pl())
-        model.circle[] = computeRK(model.T1[], model.Tz[], model.pw[], model.reheat[], mass_list[model.mass_number[]], model.picture[])
+        try 
+            model.circle[] = computeRK(model.T1[], model.Tz[], model.pw[], model.reheat[], mass_list[model.mass_number[]], model.picture[])
+        catch e
+            if isa(e,StepError)
+                @info "警告!迭代步数过多,程序停止计算!建议改变参数,重新计算!"
+                notify(model,"警告!迭代步数过多,程序停止计算!建议改变参数,重新计算!")
+            elseif isa(e,ErrorException)
+                @info "错误!温度或压强超出了范围,请调整为合适值再做计算!"
+                notify(model,"错误!温度或压强超出了范围,请调整为合适值再做计算!")
+            end
+        end   
         model.str_work[] = @sprintf("%6.3f", model.circle[].work)
         model.str_efficiency[] = @sprintf("%2.2f", model.circle[].efficiency)
         model.plot_data[] = [saturationline(mass_list[model.mass_number[]], model.picture[])]
@@ -274,11 +308,23 @@ function ui(model::testpage)
         else
             model.plot_data[] = [saturationline(mass_list[model.mass_number[]], model.picture[]), model.circle[].picture]
         end
+        model.isloading[] = false
     end
 
     onany(model.value) do (_...)
         model.click[] += 1
-        model.circle[] = computeRK(model.T1[], model.Tz[], model.pw[], model.reheat[], mass_list[model.mass_number[]], model.picture[])
+        model.isloading[] = true
+        try
+            model.circle[] = computeRK(model.T1[], model.Tz[], model.pw[], model.reheat[], mass_list[model.mass_number[]], model.picture[])
+        catch e
+            if isa(e,StepError)
+                @info "警告!迭代步数过多,程序停止计算!建议改变参数,重新计算!"
+                notify(model,"警告!迭代步数过多,程序停止计算!建议改变参数,重新计算!")
+            elseif isa(e,ErrorException)
+                @info "错误!温度或压强超出了范围,请调整为合适值再做计算!"
+                notify(model,"错误!温度或压强超出了范围,请调整为合适值再做计算!")
+            end
+        end
         model.str_work[] = @sprintf("%6.3f", model.circle[].work)
         model.str_efficiency[] = @sprintf("%2.2f", model.circle[].efficiency)
         model.plot_data[] = [saturationline(mass_list[model.mass_number[]], model.picture[])]
@@ -287,6 +333,7 @@ function ui(model::testpage)
         else
             model.plot_data[] = [saturationline(mass_list[model.mass_number[]], model.picture[]), model.circle[].picture]
         end
+        model.isloading[] = false
     end
 
 
@@ -360,9 +407,8 @@ function ui(model::testpage)
                             class="st-module",
                             [
                                 h6("&nbsp&nbsp 泵功(增压/MPa)")
-                                slider(0.01:0.01:20,
+                                slider(0:0.5:20,
                                     @data(:pw);
-                                    lazy=true,
                                     label=true)
                             ]
                         )])
@@ -387,15 +433,9 @@ function ui(model::testpage)
                                     label=true)
                             ]
                         )])
-                    row([#2023-3-1
-                        btn("绘制图像", color="primary", textcolor="black", @click("value += 1"),
-                            [
-                                tooltip(contentclass="bg-indigo", contentstyle="font-size: 16px",
-                                    style="offset: 1000px 1000px", "按下按钮以开始绘图")
-                                h6(["&nbsp&nbsp绘制次数: ",
-                                    span(model.click, @text(:click))])
-                            ]
-                        )
+                    row([
+                        btn1
+                        h6(["&nbsp&nbsp绘制次数: ",span(model.click, @text(:click))])
                     ])
                 ])
             ])
