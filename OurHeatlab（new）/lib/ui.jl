@@ -28,6 +28,7 @@ function ui(model::MyApp.MyPage)
         model.isloading[]=true
         model.click[] += 1
         change(model)
+        model.u0[] = zeros(trunc(Int, model.h[5] * model.h[6]))
         if (sort(readdir(FILE_PATH)) != String[])
             model.u0[] = vec(float(open(readdlm, joinpath(FILE_PATH, "file.txt"))))
         end
